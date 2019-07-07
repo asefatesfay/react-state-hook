@@ -36,17 +36,25 @@ const useDataApi = (initialUrl, initialData) => {
     });
 
     useEffect(() => {
+        let didCancel = false;
         async function fetchData(){
             dispatch({type: "FETCH_INIT"});
             try{
                 const result = await axios(url);
-                dispatch({type: "FETCH_SUCCESS", payload: result.data});
+                if(!didCancel){
+                    dispatch({type: "FETCH_SUCCESS", payload: result.data});
+                }
             }
             catch {
-                dispatch({type: "FETCH_FAILURE"});
+                if(!didCancel){
+                    dispatch({type: "FETCH_FAILURE"});
+                }
             }
         }
         fetchData();
+        return ()=>{
+            didCancel = true;
+        };
       }, [url]);
       return [state, setUrl];
 };
